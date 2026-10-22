@@ -1,0 +1,32 @@
+services:
+  backend:
+    build:
+      context: ./task-management-api
+      dockerfile: Dockerfile
+    container_name: task-management-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET:-supersecretjwtkeyforlocaldevelopment12345}
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3000}
+    container_name: task-management-frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      HOSTNAME: "0.0.0.0"
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3000}
+    ports:
+      - "3001:3001"
+    depends_on:
+      - backend

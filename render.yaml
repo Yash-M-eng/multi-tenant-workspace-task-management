@@ -1,0 +1,35 @@
+services:
+  # ---------------------------------------------------------------------------
+  # Backend Web Service (NestJS + Prisma + Socket.IO)
+  # ---------------------------------------------------------------------------
+  - type: web
+    name: task-management-api
+    runtime: docker
+    dockerfilePath: ./task-management-api/Dockerfile
+    dockerContext: ./task-management-api
+    plan: free
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        sync: false # Set to your Neon PostgreSQL connection string
+      - key: JWT_SECRET
+        generateValue: true
+
+  # ---------------------------------------------------------------------------
+  # Frontend Web Service (Next.js 16 App Router)
+  # ---------------------------------------------------------------------------
+  - type: web
+    name: task-management-frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    plan: free
+    dockerBuildArgs:
+      - key: NEXT_PUBLIC_API_URL
+        sync: false # Set to your Backend Web Service URL (e.g. https://task-management-api.onrender.com)
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: NEXT_PUBLIC_API_URL
+        sync: false # Set to your Backend Web Service URL
